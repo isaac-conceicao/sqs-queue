@@ -9,24 +9,26 @@ import java.net.URI;
 
 public class Main {
 
-    private static final String message = "Olá, esta é uma mensagem de teste no LocalStack!";
+    // URL to LocalStack SQS
+    private static final String QUEUE_URL = "http://sqs.us-east-1.localhost.localstack.cloud:4566/000000000000/my-queue";
+    private static final String MESSAGE = "Olá, esta é uma mensagem de teste no LocalStack!";
 
     public static void main(String[] args) {
 
         //builds the SQS client pointing to LocalStack
         SqsClient sqsClient = SqsClient.builder()
-                .region(Region.US_EAST_1)  // Região qualquer, já que LocalStack é local
+                .region(Region.US_EAST_1)
                 .endpointOverride(URI.create("http://localhost:4566"))
                 .credentialsProvider(StaticCredentialsProvider.create(
-                        AwsBasicCredentials.create("dummy", "dummy")
+                        AwsBasicCredentials.create("user", "password") //
                 ))
                 .build();
 
         // sends the message
-        SqsProducer.sendMessage(sqsClient, message);
+        SqsProducer.sendMessage(sqsClient, MESSAGE, QUEUE_URL);
 
         // receives and process the message
-        SqsConsumer.receiveMessages(sqsClient);
+        SqsConsumer.receiveMessages(sqsClient, QUEUE_URL);
 
         // closes the client
         sqsClient.close();
